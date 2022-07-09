@@ -1,87 +1,105 @@
 <script setup>
-import HelloWorld from "./components/HelloWorld.vue";
-import TheWelcome from "./components/TheWelcome.vue";
+import { ref, defineAsyncComponent } from "vue";
+
+const tasks = ref([]);
+
+const editableTask = ref({
+  title: "",
+  date: "",
+  tags: [],
+});
+
+function sortTask(a, b) {
+  if (a.completed === b.completed) {
+    return a.id - b.id;
+  } else if (a.completed) {
+    return 1;
+  } else {
+    return -1;
+  }
+}
+
+function addTask(task) {
+  tasks.value.push({
+    id: tasks.value.length + 1,
+    title: task.title,
+    date: Intl.DateTimeFormat().format(),
+    completed: false,
+    tags: task.tags,
+  });
+}
+
+function selectEditableTask(task) {
+  editableTask.value = task;
+}
+
+function updateTask(updatedTask) {
+  const task = tasks.value.find((task) => task.id === updatedTask.id);
+  task.title = updatedTask.title;
+  task.date = updatedTask.date;
+  task.tags = updatedTask.tags;
+}
+
+function removeTask(id) {
+  tasks.value = tasks.value.filter((task) => task.id !== id);
+}
+
+const TaskUpdateModal = defineAsyncComponent(() =>
+  import("@/components/TaskUpdateModal.vue")
+);
+const TaskCreateModal = defineAsyncComponent(() =>
+  import("@/components/TaskCreateModal.vue")
+);
 </script>
 
 <template>
-  <header>
-    <img
-      alt="Vue logo"
-      class="logo"
-      src="./assets/logo.svg"
-      width="125"
-      height="125"
-    />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+  <nav>
+    <div class="nav-wrapper">
+      <a href="#" class="brand-logo center">Task Manager</a>
     </div>
-  </header>
+  </nav>
 
-  <main>
-    <TheWelcome />
-  </main>
+  <div class="container">
+    <ul class="collection with-header">
+      <li class="collection-header">
+        <h4>Tasks</h4>
+      </li>
+      <li class="collection-item task" v-for="task in tasks" :key="task.id">
+        <label class="task-item" :class="{ completed: task.completed }">
+          <div>
+            <input type="checkbox" v-model="task.completed" />
+            <span> </span>
+          </div>
+          <div class="task-item__body">
+            <div>
+              <p class="task-item__title">{{ task.title }}</p>
+              <span>{{ task.date }}</span>
+            </div>
+            <div class="secondary-content task-item__actions">
+              <a
+                data-target="updateModal"
+                class="waves-effect waves-light btn modal-trigger"
+                @click="selectEditableTask(task)"
+              >
+                <i class="material-icons" id="cedit">edit</i>
+              </a>
+              <a
+                class="waves-effect waves-light btn"
+                @click.prevent="removeTask(task.id)"
+              >
+                <i class="material-icons cdel" id="cdelete">delete</i>
+              </a>
+            </div>
+          </div>
+        </label>
+      </li>
+      <li v-if="!tasks.length" class="collection-item center-align">
+        List of tasks is empty.
+      </li>
+    </ul>
+
+    <task-create-modal @addTask="addTask" />
+    <task-update-modal :task="editableTask" @update="updateTask" />
+  </div>
 </template>
-
-<style>
-@import "./assets/base.css";
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-
-  font-weight: normal;
-}
-
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
-
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-}
-</style>
+<style></style>
