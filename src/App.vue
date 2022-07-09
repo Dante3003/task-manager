@@ -27,7 +27,7 @@ function addTask(task) {
   tasks.value.push({
     id: tasks.value.length + 1,
     title: task.title,
-    date: Intl.DateTimeFormat().format(),
+    date: Intl.DateTimeFormat().format(task.date),
     completed: false,
     tags: task.tags,
   });
@@ -41,7 +41,7 @@ function selectEditableTask(task) {
 function updateTask(updatedTask) {
   const task = tasks.value.find((task) => task.id === updatedTask.id);
   task.title = updatedTask.title;
-  task.date = updatedTask.date;
+  task.date = Intl.DateTimeFormat().format(updatedTask.date);
   task.tags = updatedTask.tags;
 }
 

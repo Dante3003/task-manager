@@ -11,6 +11,7 @@ const props = defineProps({
 const emit = defineEmits(["update", "cancel"]);
 
 let tagsInstance = null;
+let dateInstance = null;
 const editableTask = ref(JSON.parse(JSON.stringify(props.task)));
 
 watch(
@@ -23,7 +24,15 @@ watch(
 onMounted(() => {
   const editableTaskChip = document.getElementById("task-tags");
   const editModal = document.getElementById("updateModal");
+  const taskDate = document.getElementById("taskDate");
   window?.M.Modal.init(editModal, {});
+  window.M.Datepicker.init(taskDate, {
+    container: document.documentElement,
+    format: "d.m.yyyy",
+    onSelect: (date) => {
+      editableTask.value.date = date;
+    },
+  });
   window?.M.Chips.init(editableTaskChip, {
     onChipAdd: (e, chip) => {
       editableTask.value.tags.push({
@@ -37,6 +46,7 @@ onMounted(() => {
     },
   });
   tagsInstance = window?.M.Chips.getInstance(editableTaskChip);
+  dateInstance = window?.M.Datepicker.getInstance(taskDate);
   editableTask.value.tags.forEach((tag) => {
     tagsInstance.addChip(tag);
   });
@@ -50,6 +60,7 @@ function updateValue(newValue) {
   editableTask.value.tags.forEach((tag) => {
     tagsInstance.addChip(tag);
   });
+  dateInstance.setDate(editableTask.value.date.split(".").reverse().join("."));
 }
 </script>
 
@@ -66,6 +77,16 @@ function updateValue(newValue) {
             v-model="editableTask.title"
           />
           <label class="active" for="tast-title">Title</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s12">
+          <input
+            id="taskDate"
+            type="text"
+            placeholder="date"
+            class="datepicker"
+          />
         </div>
       </div>
       <div class="row">
