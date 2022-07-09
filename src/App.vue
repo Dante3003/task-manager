@@ -9,7 +9,7 @@ const editableTask = ref({
   tags: [],
 });
 
-function sortTask(a, b) {
+function taskSortLogic(a, b) {
   if (a.completed === b.completed) {
     return a.id - b.id;
   } else if (a.completed) {
@@ -17,6 +17,10 @@ function sortTask(a, b) {
   } else {
     return -1;
   }
+}
+
+function tasksSort() {
+  tasks.value.sort(taskSortLogic);
 }
 
 function addTask(task) {
@@ -27,6 +31,7 @@ function addTask(task) {
     completed: false,
     tags: task.tags,
   });
+  tasksSort();
 }
 
 function selectEditableTask(task) {
@@ -42,6 +47,7 @@ function updateTask(updatedTask) {
 
 function removeTask(id) {
   tasks.value = tasks.value.filter((task) => task.id !== id);
+  tasksSort();
 }
 
 const TaskUpdateModal = defineAsyncComponent(() =>
@@ -67,7 +73,11 @@ const TaskCreateModal = defineAsyncComponent(() =>
       <li class="collection-item task" v-for="task in tasks" :key="task.id">
         <label class="task-item" :class="{ completed: task.completed }">
           <div>
-            <input type="checkbox" v-model="task.completed" />
+            <input
+              type="checkbox"
+              v-model="task.completed"
+              @change="tasksSort"
+            />
             <span> </span>
           </div>
           <div class="task-item__body">
@@ -84,7 +94,7 @@ const TaskCreateModal = defineAsyncComponent(() =>
                 <i class="material-icons" id="cedit">edit</i>
               </a>
               <a
-                class="waves-effect waves-light btn"
+                class="waves-effect waves-light btn red"
                 @click.prevent="removeTask(task.id)"
               >
                 <i class="material-icons cdel" id="cdelete">delete</i>

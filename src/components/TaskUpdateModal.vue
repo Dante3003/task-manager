@@ -84,7 +84,7 @@ function updateValue(newValue) {
       >
         Update
       </a>
-      <a href="#!" class="modal-close waves-effect waves-red btn-flat">
+      <a href="#!" class="modal-close waves-effect waves-light btn-flat">
         Cancel
       </a>
     </div>

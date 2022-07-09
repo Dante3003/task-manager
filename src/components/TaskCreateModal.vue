@@ -2,6 +2,7 @@
 import { ref, defineEmits, onMounted } from "vue";
 
 const emit = defineEmits(["addTask", "cancel"]);
+let tagsInstance = null;
 
 const newTask = ref({
   title: "",
@@ -25,10 +26,16 @@ onMounted(() => {
       );
     },
   });
+  tagsInstance = window?.M.Chips.getInstance(newTaskChip);
 });
 
 function createTask() {
   emit("addTask", newTask.value);
+  newTask.value = {
+    title: "",
+    date: "",
+    tags: [],
+  };
 }
 </script>
 <template>
